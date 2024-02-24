@@ -20,6 +20,15 @@ class Tourist(Person):
     dates_in_town = models.CharField("Dates in Town", max_length=200, default="")
     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tourists")
 
+    def liked_activities_dict(self):
+        return {
+            relation.activity.id: {
+                'name': relation.activity.name,
+                'liked': relation.liked
+            }
+            for relation in self.liked_activities.filter(liked=True)
+        }
+
 class Tour_Guide(Person):
     years_lived = models.IntegerField("Years Lived in City", default=1)
     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tour_guides")
@@ -31,6 +40,16 @@ class Tour_Guide(Person):
                 'accepted': relation.accepted
             }
             for relation in self.tourist_relations.filter(accepted=True)
+        }
+
+    @property
+    def liked_activities_dict(self):
+        return {
+            relation.activity.id: {
+                'name': relation.activity.name,
+                'liked': relation.liked
+            }
+            for relation in self.liked_activities.filter(liked=True)
         }
 
 
@@ -51,7 +70,7 @@ class Liked_Activities(models.Model):
     tourist = models.ForeignKey(Tourist, on_delete=models.CASCADE, null=True, blank=True)
     tour_guide = models.ForeignKey(Tour_Guide, on_delete=models.CASCADE, null=True, blank=True)
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    liked = models.BooleanField(default=False)
+    liked = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (('tourist', 'activity'), ('tour_guide', 'activity'))

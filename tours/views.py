@@ -10,3 +10,7 @@ class TouristViewSet(viewsets.ModelViewSet):
 class TourGuideViewSet(viewsets.ModelViewSet):
     queryset = Tour_Guide.objects.all()
     serializer_class = TourGuideSerializer
+
+class AcceptancesViewSet(viewsets.ModelViewSet):
+    queryset = Acceptances.objects.all()
+    serializer_class = AcceptancesSerializer

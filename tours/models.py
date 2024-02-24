@@ -8,7 +8,7 @@ class Person(models.Model):
     city = models.CharField("Home Town", max_length=200, default="")
     state = models.CharField("State", max_length=200, default="")
     country = models.CharField("Country", max_length=200, default="")
-    phone_number = models.CharField("Phone Number", max_length=10, default=0)
+    phone_number = models.CharField("Phone Number", max_length=10, default="")
     likes = models.JSONField(default=list)
 
     class Meta:

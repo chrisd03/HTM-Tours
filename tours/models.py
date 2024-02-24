@@ -22,4 +22,5 @@ class Tour_Guide(Person):
 
 class Tourist(Person):
     likes = models.JSONField(default=list)
+    dates_in_town = models.CharField("Dates in Town", max_length=200)
 

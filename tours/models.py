@@ -9,8 +9,6 @@ class Person(models.Model):
     state = models.CharField("State", max_length=200, default="")
     country = models.CharField("Country", max_length=200, default="")
     phone_number = models.CharField("Phone Number", max_length=10, default="")
-    likes = models.JSONField(default=list)
-
     class Meta:
         abstract = True
 
@@ -20,11 +18,11 @@ class Person(models.Model):
 
 class Tourist(Person):
     dates_in_town = models.CharField("Dates in Town", max_length=200, default="")
-
+    activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tourists")
 
 class Tour_Guide(Person):
     years_lived = models.IntegerField("Years Lived in City", default=1)
-
+    activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tour_guides")
     @property
     def accepted_tourists_dict(self):
         return {
@@ -43,3 +41,21 @@ class Acceptances(models.Model):
 
     def __str__(self):
         return f'{self.tourist.name} - {self.tour_guide.name} - {"Accepted" if self.accepted else "Pending"}'
+
+class Activity(models.Model):
+    name = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
+
+class Liked_Activities(models.Model):
+    tourist = models.ForeignKey(Tourist, on_delete=models.CASCADE, null=True, blank=True)
+    tour_guide = models.ForeignKey(Tour_Guide, on_delete=models.CASCADE, null=True, blank=True)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    liked = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (('tourist', 'activity'), ('tour_guide', 'activity'))
+
+    def __str__(self):
+        person_name = self.tourist.name if self.tourist else self.tour_guide.name
+        return f'{person_name} - {self.activity.name} - {"Liked" if self.liked else "Not Liked"}'

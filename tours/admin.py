@@ -1,9 +1,20 @@
 from django.contrib import admin
-
 from .models import *
 
-admin.site.register(Tourist)
-admin.site.register(Tour_Guide)
-admin.site.register(Acceptances)
+class Liked_ActivityInLine(admin.TabularInline):
+    model = Liked_Activities
+    extra = 1
 
-# Register your models here.
+@admin.register(Tourist)
+class TouristAdmin(admin.ModelAdmin):
+    inlines = [Liked_ActivityInLine]
+
+@admin.register(Tour_Guide)
+class TourGuideAdmin(admin.ModelAdmin):
+    inlines = [Liked_ActivityInLine]
+
+@admin.register(Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+admin.site.register(Acceptances)

@@ -16,23 +16,85 @@ class Person(models.Model):
         return self.name
 
 
+# class Tourist(Person):
+#     date_arriving = models.DateField("Date Arriving", max_length=200, default="")
+#     date_leaving = models.DateField("Date Leaving", max_length=200, default="")
+#     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tourists")
+#
+#     def liked_activities_dict(self):
+#         return {
+#             relation.activity.id: {
+#                 'name': relation.activity.name,
+#                 'liked': relation.liked
+#             }
+#             for relation in self.liked_activities.filter(liked=True)
+#         }
+#
+# class Tour_Guide(Person):
+#     years_lived = models.IntegerField("Years Lived in City", default=1)
+#     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tour_guides")
+#     @property
+#     def accepted_tourists_dict(self):
+#         return {
+#             relation.tourist.id: {
+#                 'name': relation.tourist.name,
+#                 'accepted': relation.accepted
+#             }
+#             for relation in self.tourist_relations.filter(accepted=True)
+#         }
+#
+#
+#
+#     @property
+#     def liked_activities_dict(self):
+#         return {
+#             relation.activity.id: {
+#                 'name': relation.activity.name,
+#                 'liked': relation.liked
+#             }
+#             for relation in self.liked_activities.filter(liked=True)
+#         }
+
+
+class LikedManager(models.Manager):
+    def liked_dict(self, person):
+        return{
+            relation.activity.id:{
+                'name': relation.activity.name,
+                'liked': relation.liked
+            }
+            for relation in self.filter(person=person, liked=True)
+        }
+
+
+class TouristLikedManager(LikedManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(tourist__isnull=False)
+
+
+class TourGuideLikedManager(LikedManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(tour_guide__isnull=False)
+
+
 class Tourist(Person):
     date_arriving = models.DateField("Date Arriving", max_length=200, default="")
     date_leaving = models.DateField("Date Leaving", max_length=200, default="")
     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tourists")
 
-    def liked_activities_dict(self):
-        return {
-            relation.activity.id: {
-                'name': relation.activity.name,
-                'liked': relation.liked
-            }
-            for relation in self.liked_activities.filter(liked=True)
-        }
+    def liked_dict(self):
+        return TouristLikedManager().liked_dict(self)
+
+
 
 class Tour_Guide(Person):
     years_lived = models.IntegerField("Years Lived in City", default=1)
     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tour_guides")
+
+    def liked_dict(self):
+        return TourGuideLikedManager().liked_dict(self)
+
+
     @property
     def accepted_tourists_dict(self):
         return {
@@ -43,15 +105,6 @@ class Tour_Guide(Person):
             for relation in self.tourist_relations.filter(accepted=True)
         }
 
-    @property
-    def liked_activities_dict(self):
-        return {
-            relation.activity.id: {
-                'name': relation.activity.name,
-                'liked': relation.liked
-            }
-            for relation in self.liked_activities.filter(liked=True)
-        }
 
 
 class Acceptances(models.Model):

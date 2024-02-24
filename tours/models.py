@@ -17,6 +17,7 @@ class Person(models.Model):
 
 
 class Tourist(Person):
+    date_arriving = models.DateField("Date Arriving", max_length=200, default="")
     date_leaving = models.DateField("Date Leaving", max_length=200, default="")
     activities = models.ManyToManyField("Activity", through="Liked_Activities", related_name="tourists")
 

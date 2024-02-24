@@ -23,5 +23,6 @@ class Tour_Guide(Person):
 
 
 class Tourist(Person):
-    dates_in_town = models.CharField("Dates in Town", max_length=200, default="")
+    date_leaving = models.DateField("Date Leaving", max_length=200, default="")
+
 
